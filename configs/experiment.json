@@ -1,0 +1,10 @@
+{
+  "max_render_calls": 2,
+  "attempt_seeds": [
+    13,
+    14
+  ],
+  "max_foreground_mae": 18,
+  "min_red_background_fraction": 0.35,
+  "checkpoint_source": "P01 Yahoo snapshot 719f1ac136b76609d8bd371606d0eaeda731b0dd (SD2 backbone)"
+}

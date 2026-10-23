@@ -1,45 +1,30 @@
-from io import BytesIO
-from pathlib import Path
+"""Load the small P01 product/mask bundle offline and verify every input hash."""
+
 import hashlib
 import json
-import numpy as np
-from PIL import Image, ImageOps
-import requests
-from scipy import ndimage
+from pathlib import Path
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = 'https://amazon-berkeley-objects.s3.amazonaws.com/images/small/'
+BUNDLE = ROOT / "examples" / "products"
 
-def prepare(item, size=384, ref=False):
-    key = 'reference' if ref else 'photo'
-    path = ROOT / '.cache' / 'abo' / item[key]
-    if not path.exists():
-        r = requests.get(BASE + item[key], timeout=40)
-        r.raise_for_status()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(r.content)
-    raw = path.read_bytes()
-    digest = hashlib.sha256(raw).hexdigest()
-    if item.get(key + '_sha256', digest) != digest:
-        raise ValueError(f"Image changed: {item[key]}")
-    with Image.open(BytesIO(raw)) as inp:
-        image = ImageOps.pad(inp.convert('RGB'), (size,size), color='white')
-    # ABO packshots have a near-white backdrop. Only remove light pixels
-    # connected to the border, preserving interior white text and labels.
-    light = np.asarray(image).min(axis=-1) > 236
-    borders = np.zeros_like(light)
-    borders[[0,-1],:] = True
-    borders[:,[0,-1]] = True
-    bg = ndimage.binary_propagation(light & borders, mask=light)
-    mask = ndimage.binary_fill_holes(~bg)
-    labels, n = ndimage.label(mask)
-    if n < 1:
-        raise ValueError('No foreground found')
-    mask = labels == np.bincount(labels.ravel())[1:].argmax()+1
-    if not .01 < mask.mean() < .96:
-        raise ValueError(f'Foreground fraction {mask.mean():.3f} outside supported domain')
-    return image, Image.fromarray(mask.astype('uint8')*255), digest
 
 def items():
-    return json.loads((ROOT/'configs'/'products.json').read_text(encoding='utf-8-sig'))
+    return json.loads((BUNDLE / "manifest.json").read_text(encoding="utf-8-sig"))
 
+
+def prepare(item):
+    files = {}
+    for name in ("input.png", "mask.png"):
+        rel = f'{item["id"]}/{name}'
+        target = BUNDLE / rel
+        digest = hashlib.sha256(target.read_bytes()).hexdigest()
+        if digest != item["files"][rel]:
+            raise ValueError("P01 input bundle hash mismatch: " + rel)
+        with Image.open(target) as image:
+            files[name] = image.copy()
+    return (
+        files["input.png"].convert("RGB"),
+        files["mask.png"].convert("L"),
+        item["original_sha256"],
+    )

@@ -1,2 +1,3 @@
 ComfyUI: https://github.com/Comfy-Org/ComfyUI/tree/ab08f7b2caa6d4007ecde3762116c6193613f43b (GPL-3.0). The server is installed separately. The HTTP API and standard CheckpointLoaderSimple, CLIPTextEncode, InpaintModelConditioning, KSampler, VAEDecode and SaveImage nodes handle native inpainting. No server code or bundled checkpoint is redistributed. Select a model with native ComfyUI inpainting support under its own weight terms and record its SHA-256 alongside results. ABO sources and attribution in data.md.
 
+P01 handoff: four 384 px product packshots, masks, requests and per-PNG hashes from the product-background-editing src/prepare_examples.py export are checked into examples/products. This independent repo loads them offline via src/data.py.
