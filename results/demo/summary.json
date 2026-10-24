@@ -1,0 +1,29 @@
+{
+  "direct": {
+    "normal": {
+      "tasks": 1,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 1,
+      "with_prediction": 1
+    }
+  },
+  "fixed": {
+    "normal": {
+      "tasks": 1,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 2,
+      "with_prediction": 1
+    }
+  },
+  "feedback": {
+    "normal": {
+      "tasks": 1,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 2,
+      "with_prediction": 1
+    }
+  }
+}

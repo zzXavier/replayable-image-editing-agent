@@ -1,0 +1,4 @@
+case,mode,status,render_calls,keep_error,red_background
+B074H6ZXT5-normal,direct,rejected,1,19.701549079179326,0.09388518883679751
+B074H6ZXT5-normal,feedback,rejected,2,11.632619658950254,0.2920179480472444
+B074H6ZXT5-normal,fixed,rejected,2,11.632619658950254,0.2920179480472444

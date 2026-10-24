@@ -1,2 +1,3 @@
 Validated step graph, mask refusal, feedback recovery, corruption detection and bounded replay with a deterministic test double. Those tests do not count as actual ComfyUI inference. Formal experiment requires the pinned server and a real inpainting checkpoint. Next command: python run.py demo --checkpoint <the installed inpainting checkpoint filename>. Keep private until a real server run and independent verification.
 
+Real HTTP smoke passed on ComfyUI v0.3.12, commit 55add502206ed5511a04215db4ab8f1cfa3d99ae. The original newer pin failed to import comfy-kitchen on Torch 2.4; the official stable tag supports this workstation. CPU latent-inpainting experiment uses the pinned SD1.5 base. See results/probe/protocol.json.
