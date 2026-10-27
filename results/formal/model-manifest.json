@@ -1,0 +1,14 @@
+{
+  "folder": "sd15",
+  "engine": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "device": "cpu",
+  "weights": {
+    "text_encoder/model.fp16.safetensors": "77795e2023adcf39bc29a884661950380bd093cf0750a966d473d1718dc9ef4e",
+    "unet/diffusion_pytorch_model.fp16.safetensors": "c83908253f9a64d08c25fc90874c9c8aef9a329ce1ca5fb909d73b0c83d1ea21",
+    "vae/diffusion_pytorch_model.fp16.safetensors": "4fbcf0ebe55a0984f5a5e00d8c4521d52359af7229bb4d81890039d2aa16dd7c"
+  },
+  "omp_threads": "4",
+  "mkl_threads": "4",
+  "repo": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+  "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14"
+}

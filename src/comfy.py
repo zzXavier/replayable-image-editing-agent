@@ -1,6 +1,5 @@
 """Minimal client for a local ComfyUI server. The server owns all model execution."""
 
-from pathlib import Path
 import time
 import requests
 

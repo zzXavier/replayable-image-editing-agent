@@ -1,4 +1,5 @@
 import tempfile
+import json
 import unittest
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -40,6 +41,20 @@ class TestTrace(unittest.TestCase):
             )
             self.assertEqual(log["status"], "invalid_mask")
             self.assertEqual(len(log["steps"]), 1)
+            self.assertEqual(replay(Path(d) / "trace.json"), log)
+
+    def test_replay_rejects_forged_final_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            source = Image.new("RGB", (16, 16), "white")
+            mask = Image.new("L", source.size)
+            ImageDraw.Draw(mask).rectangle((3, 3, 9, 9), fill=255)
+            trace = execute(TestBackend(), source, mask, "red", "direct", 7, out)
+            trace["status"] = "rejected"
+            path = out / "trace.json"
+            path.write_text(json.dumps(trace))
+            with self.assertRaisesRegex(ValueError, "Final decision"):
+                replay(path)
 
     def test_diffusers_loader(self):
         self.assertEqual(

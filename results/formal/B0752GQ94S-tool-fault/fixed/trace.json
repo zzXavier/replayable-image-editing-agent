@@ -1,0 +1,157 @@
+{
+  "mode": "fixed",
+  "prompt": "A studio photo of shampoo with a plain red backdrop",
+  "seed": 13,
+  "max_render_calls": 2,
+  "checkpoint": "diffusers:sd15",
+  "server_source_revision": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "steps": [
+    {
+      "tool": "validate_mask",
+      "accepted": true,
+      "keep_fraction": 0.1471015082465278
+    },
+    {
+      "tool": "render",
+      "attempt": 0,
+      "seed": 13,
+      "error": "Injected test condition: first editing tool call unavailable"
+    },
+    {
+      "tool": "render",
+      "attempt": 1,
+      "seed": 14,
+      "image": "candidate-1.png",
+      "sha256": "4b8e782fb99d5e3b6ed12ceb1c244fa1871e84192fbaf6b68ffe186f4e395236",
+      "graph": {
+        "1": {
+          "class_type": "DiffusersLoader",
+          "inputs": {
+            "model_path": "sd15"
+          }
+        },
+        "2": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "candidate-1-input (1).png"
+          }
+        },
+        "3": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "A studio photo of shampoo with a plain red backdrop",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "5": {
+          "class_type": "InpaintModelConditioning",
+          "inputs": {
+            "positive": [
+              "3",
+              0
+            ],
+            "negative": [
+              "4",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ],
+            "pixels": [
+              "2",
+              0
+            ],
+            "mask": [
+              "2",
+              1
+            ],
+            "noise_mask": true
+          }
+        },
+        "6": {
+          "class_type": "KSampler",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "seed": 14,
+            "steps": 12,
+            "cfg": 7,
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "positive": [
+              "5",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "latent_image": [
+              "5",
+              2
+            ],
+            "denoise": 1
+          }
+        },
+        "7": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "6",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "8": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "images": [
+              "7",
+              0
+            ],
+            "filename_prefix": "vision_edit"
+          }
+        }
+      }
+    },
+    {
+      "tool": "evaluate",
+      "attempt": 1,
+      "scores": {
+        "keep_error": 15.858420543082387,
+        "red_background": 0.08437164552936031
+      },
+      "accepted": false
+    }
+  ],
+  "inputs": {
+    "source.png": "08e09b7ced0268c177175f77289b7ed8fe1967c4ef4da6a323391f84467ab0cc",
+    "mask.png": "0c0fe94acd605e22f4d43f68bb77964f024cdfc89576516d5d3a2f1b7980da62"
+  },
+  "chosen_image": "candidate-1.png",
+  "scores": {
+    "keep_error": 15.858420543082387,
+    "red_background": 0.08437164552936031
+  },
+  "status": "rejected"
+}
