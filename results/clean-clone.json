@@ -1,0 +1,20 @@
+{
+  "source": "fresh private GitHub clone + separate venv, pinned shared weights and independently started ComfyUI",
+  "formal_commit": "215880502a4b149b02e1b2b44dc82c4f2c502eb2",
+  "release_commit_verified_offline": "2b89ce59efeaf8dd24311b258acfabcad4c62223",
+  "identical_tree": "8e73f5e020e8d63ecb4742d93a9635cb204beb3d",
+  "full_workflow_traces": 18,
+  "status_and_attempt_count_match": true,
+  "verified_inputs": 36,
+  "candidate_pngs": 14,
+  "bitwise_identical_candidate_pngs": 0,
+  "maximum_per_image_mean_absolute_error_rgb_0_255": 0.01372386791087963,
+  "maximum_single_channel_intensity_difference": 3.0,
+  "maximum_metric_difference": {
+    "keep_error": 0.0009376992610938828,
+    "red_background": 2.0121129197775423e-05
+  },
+  "fresh_demo_workflows": 3,
+  "final_tree_independent_unit_tests": 4,
+  "offline_replay": "every input/output SHA and acceptance decision verified within each run"
+}
