@@ -1,0 +1,26 @@
+{
+  "mode": "direct",
+  "prompt": "A studio photo of coffee with a plain red backdrop",
+  "seed": 13,
+  "max_render_calls": 2,
+  "checkpoint": "diffusers:sd15",
+  "server_source_revision": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "steps": [
+    {
+      "tool": "validate_mask",
+      "accepted": true,
+      "keep_fraction": 0.6629570855034722
+    },
+    {
+      "tool": "render",
+      "attempt": 0,
+      "seed": 13,
+      "error": "Injected test condition: first editing tool call unavailable"
+    }
+  ],
+  "inputs": {
+    "source.png": "dd13db3d8c2d38543118023c95ecb282a3b43a140405a86b0a474c7783b29d96",
+    "mask.png": "5ffa34a7accb9ef9d0120f2b9e4f7f9a59b8fd9f1332bbacd21c98538f06a7a8"
+  },
+  "status": "tool_error"
+}

@@ -118,7 +118,7 @@ def main():
                 try:
                     if requests.get(base + "/system_stats", timeout=2).ok:
                         break
-                except requests.ConnectionError:
+                except (requests.ConnectionError, requests.Timeout):
                     pass
                 time.sleep(1)
             else:

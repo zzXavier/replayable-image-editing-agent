@@ -1,28 +1,48 @@
 # Replayable image editing agent
 
-Run a bounded image-editing workflow against a local ComfyUI server and audit every generated candidate. Fixed order, direct inpainting and feedback have the same cap of two model calls. Direct editing uses one; fixed always attempts two; feedback stops when foreground error and red-background thresholds pass. Both score and actual calls are reported.
+Compare a direct image edit, a fixed two-attempt workflow and a feedback policy that may stop after the first attempt. Each task can be audited from the original product image through the ComfyUI request, output hash and acceptance decision.
 
-Start the pinned ComfyUI server with a compatible native Stable Diffusion inpainting checkpoint loaded under models/checkpoints. Install this repo's Python requirements, then run:
+![Original held-out product and the actual outputs selected by the three policies](results/formal/comparison.jpg)
+
+With the environment, server and weights prepared below, the shortest local demo is `python src/local_server.py demo --source .cache/ComfyUI --model-dir .cache/sd15 --device cpu`.
+
+## Reproduce
+
+Use Python 3.11. For CUDA runs install matching PyTorch 2.4.1 and torchvision 0.19.1 CUDA wheels first. CPU and CUDA outputs can differ. Our reported run used CPU with OMP_NUM_THREADS=4 and MKL_NUM_THREADS=4. The launcher binds a temporary server to localhost and stops it after the run.
 
 ```sh
-python run.py demo --checkpoint CHECKPOINT.safetensors
-python run.py reproduce --checkpoint CHECKPOINT.safetensors
-python run.py evaluate
+python -m pip install -r requirements-comfy-api.txt
+git clone --depth 1 --branch v0.3.12 https://github.com/Comfy-Org/ComfyUI.git .cache/ComfyUI
+python src/fetch_sd15.py --output .cache/sd15
+python -m unittest discover -s tests
+python src/local_server.py probe --source .cache/ComfyUI
+python src/local_server.py demo --source .cache/ComfyUI --model-dir .cache/sd15 --device cpu
+python src/local_server.py reproduce --source .cache/ComfyUI --model-dir .cache/sd15 --device cpu
+python run.py evaluate --output results/formal
 python run.py replay --trace results/formal/B074H6ZXT5-normal/feedback/trace.json
 ```
 
-`src/comfy.py` uploads a masked source, submits an inpaint graph and retrieves its PNG. `src/agent.py` checks masks, limits retries, records input/output hashes, prompt, seed, checkpoint name, graph and decisions. Replay checks saved images and recalculates scores without GPU access. To rerun diffusion the recorded graph and checkpoint must be available on the server. `src/data.py` uses the exact pinned public catalog inputs and mask semantics used by P01. The optional fault is injected and clearly labeled. This report only evaluates the predeclared request for a red background.
+To use an already running server, use `python run.py demo --checkpoint diffusers:sd15`. Specify `--url` if the server uses a different port. See [the fixed model manifest](results/formal/model-manifest.json) for the three verified weights. The model is the four-channel SD1.5 base with masked latent sampling.
 
-The pinned server also supports a Diffusers directory via --checkpoint diffusers:FOLDER. Add its parent as a diffusers search directory in ComfyUI extra_model_paths.yaml. The P01 Yahoo snapshot can then supply the SD2 inpainting backbone directly.
-For an isolated launch with the pinned server already installed in the active environment, run python src/local_server.py demo --source PATH_TO_COMFYUI --model-dir PATH_TO_YAHOO_SNAPSHOT. This binds only to localhost, checks the server revision, writes a log, and stops the server after the run.
-The 407 KB P01 input bundle is shipped under examples/products with per-PNG SHA-256 values. Every image and mask is verified locally before submitting a graph, so the agent input path works offline.
+## Measured results
 
-## Tested local HTTP environment
+Two held-out products were evaluated under three conditions for each policy, yielding 18 complete traces. Each policy has at most two render attempts. Direct editing uses one. Fixed editing always attempts two, while feedback chooses whether to retry after scoring the first image. A render attempt can fail before a prediction exists.
 
-Use Python 3.11, install requirements-comfy-api.txt, then clone the official server with `git clone --depth 1 --branch v0.3.12 https://github.com/Comfy-Org/ComfyUI.git .cache/ComfyUI`. The exact source commit is validated by the launcher. A headless run does not require video template packages or custom nodes.
+| Condition (two tasks per policy) | Direct | Fixed | Feedback |
+|---|---:|---:|---:|
+| Normal inputs, images generated | 2/2 | 2/2 | 2/2 |
+| Normal inputs passing both criteria | 0/2 | 0/2 | 0/2 |
+| Bad masks rejected before any render | 2/2 | 2/2 | 2/2 |
+| First tool call fails, image recovered | 0/2 | 2/2 | 2/2 |
 
-- `python src/local_server.py probe --source .cache/ComfyUI` exercises real HTTP alpha-mask upload, queue execution and PNG download. The recorded 384×384 transfer had zero mismatched pixels. See [the measured probe](results/probe/protocol.json).
-- `python src/fetch_sd15.py --output .cache/sd15` fetches and hashes the pinned base model. Its CreativeML Open RAIL-M terms are available on the [official model card](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5). Weights stay in the local cache.
-- `python src/local_server.py demo --source .cache/ComfyUI --model-dir .cache/sd15 --device cpu` runs the actual latent inpainting graph. On constrained CPUs set OMP_NUM_THREADS and MKL_NUM_THREADS to four.
-- Change `demo` to `reproduce` for the full held-out experiment. Each run writes the ComfyUI source revision, execution device, model ID and SHA-256 weight digests.
-The server caches the last 32 node outputs so that submitting identical seeds and images across policies can reuse identical predictions. Call counts in the table measure attempted editing-tool invocations, including explicitly injected failures, and do not imply repeated uncached denoising work.
+The predeclared acceptance checks require a foreground mean absolute pixel error at most 18/255 and red-dominant pixels on at least 35% of the background. For the coffee tin, the second seed improved red coverage from 9.4% to 29.2% and reduced foreground error from 19.70 to 11.63, still below the background criterion. The two-attempt policies handled the injected tool faults but neither produced an accepted edit on this small test. Rejection remains a valid terminal decision. [Per-task scores](results/formal/scores.csv) · [Aggregate results](results/formal/summary.json) · [Fault case](results/formal/injected-failure.jpg)
+
+## Architecture
+
+- `src/data.py` loads four SHA-256-checked public product images and masks exported by P01. Two products are held out. The compact bundle in `examples/products/` works offline and its license is recorded in [data.md](data.md).
+- `src/comfy.py` uploads the alpha-masked input, submits native ComfyUI inpainting nodes, polls the queue and downloads the prediction. The server can cache identical graph results. Reported attempts count issued editing tool calls, including injected faults.
+- `src/agent.py` validates input masks, scores the unchanged and edited regions, limits retries and records a trace. Offline replay checks input/output hashes, attempt sequence, graph seed, selected prediction and final decision.
+- `tests/check_live_server.py` independently checks the live HTTP upload and download path. The real 384×384 mask round-trip had zero changed pixels. [Probe results](results/probe/protocol.json)
+
+Sources and model terms are in [UPSTREAM.md](UPSTREAM.md). Current handoff and any outstanding work are in [HANDOFF.md](HANDOFF.md).
+

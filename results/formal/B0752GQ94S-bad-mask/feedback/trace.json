@@ -1,0 +1,19 @@
+{
+  "mode": "feedback",
+  "prompt": "A studio photo of shampoo with a plain red backdrop",
+  "seed": 13,
+  "max_render_calls": 2,
+  "checkpoint": "diffusers:sd15",
+  "server_source_revision": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "steps": [
+    {
+      "tool": "validate_mask",
+      "accepted": false
+    }
+  ],
+  "inputs": {
+    "source.png": "08e09b7ced0268c177175f77289b7ed8fe1967c4ef4da6a323391f84467ab0cc",
+    "mask.png": "84968dfb8cfc77ea473842d38ba9e91744649b5d41b43691f611dc81dc35f2c5"
+  },
+  "status": "invalid_mask"
+}

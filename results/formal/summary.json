@@ -1,0 +1,71 @@
+{
+  "direct": {
+    "normal": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 2,
+      "with_prediction": 2
+    },
+    "bad-mask": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 2,
+      "render_attempts": 0,
+      "with_prediction": 0
+    },
+    "tool-fault": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 2,
+      "with_prediction": 0
+    }
+  },
+  "fixed": {
+    "normal": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 4,
+      "with_prediction": 2
+    },
+    "bad-mask": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 2,
+      "render_attempts": 0,
+      "with_prediction": 0
+    },
+    "tool-fault": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 4,
+      "with_prediction": 2
+    }
+  },
+  "feedback": {
+    "normal": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 4,
+      "with_prediction": 2
+    },
+    "bad-mask": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 2,
+      "render_attempts": 0,
+      "with_prediction": 0
+    },
+    "tool-fault": {
+      "tasks": 2,
+      "accepted": 0,
+      "invalid_masks": 0,
+      "render_attempts": 4,
+      "with_prediction": 2
+    }
+  }
+}

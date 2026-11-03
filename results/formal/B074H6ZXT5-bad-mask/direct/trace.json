@@ -1,0 +1,19 @@
+{
+  "mode": "direct",
+  "prompt": "A studio photo of coffee with a plain red backdrop",
+  "seed": 13,
+  "max_render_calls": 2,
+  "checkpoint": "diffusers:sd15",
+  "server_source_revision": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "steps": [
+    {
+      "tool": "validate_mask",
+      "accepted": false
+    }
+  ],
+  "inputs": {
+    "source.png": "dd13db3d8c2d38543118023c95ecb282a3b43a140405a86b0a474c7783b29d96",
+    "mask.png": "84968dfb8cfc77ea473842d38ba9e91744649b5d41b43691f611dc81dc35f2c5"
+  },
+  "status": "invalid_mask"
+}
