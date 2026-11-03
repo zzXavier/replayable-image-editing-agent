@@ -1,6 +1,7 @@
 import tempfile
 import json
 import unittest
+from copy import deepcopy
 from pathlib import Path
 from PIL import Image, ImageDraw
 from src.agent import execute, replay
@@ -61,3 +62,87 @@ class TestTrace(unittest.TestCase):
             workflow("diffusers:checked-sha", "a.png", "red", 1)["1"]["inputs"],
             {"model_path": "checked-sha"},
         )
+
+    def test_replay_binds_graph_to_request(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            source = Image.new("RGB", (16, 16), "white")
+            mask = Image.new("L", source.size)
+            ImageDraw.Draw(mask).rectangle((3, 3, 9, 9), fill=255)
+            trace = execute(TestBackend(), source, mask, "red", "direct", 13, out)
+            for field, value in (("prompt", "blue"), ("checkpoint", "other-model")):
+                with self.subTest(field=field):
+                    altered = deepcopy(trace)
+                    altered[field] = value
+                    path = out / "trace.json"
+                    path.write_text(json.dumps(altered))
+                    with self.assertRaises(ValueError):
+                        replay(path)
+            trace["steps"][1]["graph"]["6"]["inputs"]["steps"] = 1
+            (out / "trace.json").write_text(json.dumps(trace))
+            with self.assertRaises(ValueError):
+                replay(out / "trace.json")
+
+    def test_fault_trace_requires_validation_and_failed_call(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            source = Image.new("RGB", (16, 16), "white")
+            mask = Image.new("L", source.size)
+            ImageDraw.Draw(mask).rectangle((3, 3, 9, 9), fill=255)
+            trace = execute(TestBackend(), source, mask, "red", "direct", 13, out, fail_first=True)
+            self.assertEqual(replay(out / "trace.json"), trace)
+            validate, failed = trace["steps"]
+            no_error = {k: v for k, v in failed.items() if k != "error"}
+            for steps in ([], [failed], [validate], [validate, no_error], [failed, validate]):
+                with self.subTest(steps=steps):
+                    altered = dict(trace, steps=steps)
+                    (out / "trace.json").write_text(json.dumps(altered))
+                    with self.assertRaises(ValueError):
+                        replay(out / "trace.json")
+
+    def test_comfy_upload_alias_and_alpha_match_the_recorded_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            source = Image.new("RGB", (16, 16), "white")
+            mask = Image.new("L", source.size)
+            ImageDraw.Draw(mask).rectangle((3, 3, 9, 9), fill=255)
+            trace = execute(TestBackend(), source, mask, "red", "direct", 13, out)
+            trace["server_source_revision"] = "local-test"
+            upload = out / "candidate-0-input.png"
+            packed = source.convert("RGBA")
+            packed.putalpha(mask)
+            packed.save(upload)
+            graph_image = trace["steps"][1]["graph"]["2"]["inputs"]
+            graph_image["image"] = "candidate-0-input (2).png"
+            path = out / "trace.json"
+            path.write_text(json.dumps(trace))
+            self.assertEqual(replay(path), trace)
+            graph_image["image"] = "other-input.png"
+            path.write_text(json.dumps(trace))
+            with self.assertRaises(ValueError):
+                replay(path)
+            graph_image["image"] = "candidate-0-input.png"
+            path.write_text(json.dumps(trace))
+            packed.putalpha(255)
+            packed.save(upload)
+            with self.assertRaises(ValueError):
+                replay(path)
+
+    def test_replay_requires_correct_evaluation_order_and_fixed_budget(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory)
+            source = Image.new("RGB", (16, 16), "white")
+            mask = Image.new("L", source.size)
+            ImageDraw.Draw(mask).rectangle((3, 3, 9, 9), fill=255)
+            trace = execute(TestBackend(), source, mask, "red", "fixed", 5, out, fail_first=True)
+            self.assertEqual(replay(out / "trace.json"), trace)
+            validate, failed, rendered, evaluated = trace["steps"]
+            for steps in ([validate, failed, evaluated, rendered], [*trace["steps"], evaluated]):
+                (out / "trace.json").write_text(json.dumps(dict(trace, steps=steps)))
+                with self.assertRaises(ValueError):
+                    replay(out / "trace.json")
+            shortened = {"status": "tool_error", "steps": [validate, failed]}
+            altered = {k: v for k, v in trace.items() if k not in ("scores", "chosen_image")} | shortened
+            (out / "trace.json").write_text(json.dumps(altered))
+            with self.assertRaises(ValueError):
+                replay(out / "trace.json")

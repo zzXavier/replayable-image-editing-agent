@@ -1,8 +1,10 @@
 from pathlib import Path
 import hashlib
 import json
+import re
 import numpy as np
 from PIL import Image
+from src.comfy import workflow
 
 
 def checksum(path):
@@ -67,10 +69,10 @@ def execute(backend, source, mask, prompt, mode, seed, out, fail_first=False):
                 )
             image, graph = backend.render(source, mask, prompt, seed + n, candidate)
             image.save(candidate)
+            scores = assess(source, image, mask)
             entry["image"] = candidate.name
             entry["sha256"] = checksum(candidate)
             entry["graph"] = graph
-            scores = assess(source, image, mask)
             trace["steps"].append(
                 {
                     "tool": "evaluate",
@@ -84,7 +86,7 @@ def execute(backend, source, mask, prompt, mode, seed, out, fail_first=False):
             if mode == "direct" or (mode == "feedback" and acceptable(scores)):
                 break
         except (OSError, ValueError, RuntimeError) as error:
-            entry["error"] = str(error)
+            entry["error"] = str(error) or type(error).__name__
             if mode == "direct":
                 break
     return finish(
@@ -103,57 +105,71 @@ def replay(path):
     for key, digest in saved["inputs"].items():
         if checksum(out / key) != digest:
             raise ValueError("Input hash mismatch: " + key)
-    renders = [step for step in saved["steps"] if step["tool"] == "render"]
     mode = saved["mode"]
     limit = 1 if mode == "direct" else 2
-    if (
-        mode not in ("direct", "fixed", "feedback")
-        or saved["max_render_calls"] != 2
-        or len(renders) > limit
-    ):
+    if mode not in ("direct", "fixed", "feedback") or saved["max_render_calls"] != 2:
         raise ValueError("Render budget or policy mismatch")
+    steps = iter(saved["steps"])
+    last_image, last_scores = None, None
     with Image.open(out / "source.png") as source, Image.open(out / "mask.png") as mask:
-        valid = (
-            source.size == mask.size and 0.01 < (np.asarray(mask) > 127).mean() < 0.96
-        )
-    if not valid:
-        if saved["status"] != "invalid_mask" or renders:
-            raise ValueError("Invalid mask was not rejected")
-        return saved
-    last_image = None
-    last_scores = None
-    for index, step in enumerate(renders):
-        if step["attempt"] != index or step["seed"] != saved["seed"] + index:
-            raise ValueError("Seed or attempt sequence mismatch")
-        if mode == "feedback" and last_scores is not None and acceptable(last_scores):
-            raise ValueError("Unexpected retry after acceptance")
-        if "image" in step:
-            if (
-                step["image"] != f"candidate-{index}.png"
-                or step["graph"]["6"]["inputs"]["seed"] != step["seed"]
-            ):
-                raise ValueError("Artifact name or graph seed mismatch")
-            if checksum(out / step["image"]) != step["sha256"]:
+        fraction = float((np.asarray(mask) > 127).mean())
+        valid = source.size == mask.size and 0.01 < fraction < 0.96
+        validation = {"tool": "validate_mask", "accepted": valid}
+        if valid:
+            validation["keep_fraction"] = fraction
+        if next(steps, None) != validation:
+            raise ValueError("Missing or incorrect initial mask validation")
+        status = "tool_error" if valid else "invalid_mask"
+        for index in range(limit if valid else 0):
+            render = next(steps, None)
+            seed = saved["seed"] + index
+            header = {"tool": "render", "attempt": index, "seed": seed}
+            if not isinstance(render, dict) or any(render.get(k) != v for k, v in header.items()):
+                raise ValueError("Missing or out-of-order render attempt")
+            if "error" in render:
+                error = render["error"]
+                if not isinstance(error, str) or not error or render != (header | {"error": error}):
+                    raise ValueError("Malformed failed render attempt")
+                continue
+            name = f"candidate-{index}.png"
+            if render.get("image") != name or "sha256" not in render or "graph" not in render:
+                raise ValueError("Render attempt lacks a result or recorded error")
+            if checksum(out / name) != render["sha256"]:
                 raise ValueError("Output hash mismatch")
-            i = step["attempt"]
-            s = next(
-                x
-                for x in saved["steps"]
-                if x["tool"] == "evaluate" and x["attempt"] == i
-            )
-            with Image.open(out / "source.png") as src, Image.open(
-                out / "mask.png"
-            ) as m, Image.open(out / step["image"]) as im:
-                now = assess(src, im, m)
-            if now != s["scores"] or acceptable(now) != s["accepted"]:
-                raise ValueError("Acceptance decision diverged")
-            last_image = step["image"]
-            last_scores = now
-    status = (
-        "tool_error"
-        if last_scores is None
-        else ("accepted" if acceptable(last_scores) else "rejected")
-    )
+            graph = render["graph"]
+            try:
+                upload = graph["2"]["inputs"]["image"]
+                expected = workflow(saved["checkpoint"], upload, saved["prompt"], seed)
+            except (KeyError, TypeError, AttributeError) as e:
+                raise ValueError("Missing workflow/request parameters") from e
+            if not isinstance(upload, str) or not upload or graph != expected:
+                raise ValueError("Workflow differs from recorded request")
+            packed = out / f"candidate-{index}-input.png"
+            if packed.exists() or saved.get("server_source_revision"):
+                # ComfyUI appends " (n)" to colliding uploads on the server.
+                if not re.fullmatch(rf"candidate-{index}-input(?: \(\d+\))?\.png", upload):
+                    raise ValueError("Graph refers to an unrelated uploaded image")
+                if not packed.is_file():
+                    raise ValueError("Missing recorded ComfyUI input image")
+                with Image.open(packed) as rgba:
+                    if (
+                        rgba.mode != "RGBA"
+                        or not np.array_equal(rgba.convert("RGB"), source)
+                        or not np.array_equal(rgba.getchannel("A"), mask)
+                    ):
+                        raise ValueError("Uploaded pixels differ from source or mask")
+            with Image.open(out / name) as image:
+                now = assess(source, image, mask)
+            passed = acceptable(now)
+            evaluation = {"tool": "evaluate", "attempt": index, "scores": now, "accepted": passed}
+            if next(steps, None) != evaluation:
+                raise ValueError("Missing, out-of-order or incorrect evaluation")
+            last_image, last_scores = name, now
+            status = "accepted" if passed else "rejected"
+            if mode == "feedback" and passed:
+                break
+    if any(True for _ in steps):
+        raise ValueError("Unexpected steps after the policy stopped")
     if (
         saved["status"] != status
         or saved.get("chosen_image") != last_image
