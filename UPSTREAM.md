@@ -1,9 +1,2 @@
-# Upstream sources
+ComfyUI: https://github.com/Comfy-Org/ComfyUI/tree/ab08f7b2caa6d4007ecde3762116c6193613f43b (GPL-3.0). The server is installed separately. The HTTP API and standard CheckpointLoaderSimple, CLIPTextEncode, InpaintModelConditioning, KSampler, VAEDecode and SaveImage nodes handle native inpainting. No server code or bundled checkpoint is redistributed. Select a model with native ComfyUI inpainting support under its own weight terms and record its SHA-256 alongside results. ABO sources and attribution in data.md.
 
-[Comfy-Org/ComfyUI](https://github.com/Comfy-Org/ComfyUI/tree/ab08f7b2caa6d4007ecde3762116c6193613f43b)
-
-- Revision: ab08f7b2caa6d4007ecde3762116c6193613f43b
-- Reported code license: GPL-3.0
-- Starting point: script_examples/basic_api_example.py
-- Integration: use the upstream implementation as a separately pinned dependency. Preserve the original notices when redistributing source.
-- Weights and data have separate terms. Their source, revision and attribution belong with the experiment manifest.

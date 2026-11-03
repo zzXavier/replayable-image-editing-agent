@@ -1,0 +1,47 @@
+[
+  {
+    "id": "B07FFHHG1Q",
+    "name": "lemonade",
+    "photo": "90/90408e42.jpg",
+    "reference": "1c/1c061a66.jpg",
+    "split": "dev",
+    "photo_sha256": "064e8dc335dd10e66aa6356a82e9e6a8b790beaef177675e42d1e9860ac9d700",
+    "reference_sha256": "5a940b8e18e54087ac46224c6d0e1baf27851cd3d565a23ecd4e2e4cca621847"
+  },
+  {
+    "id": "B07QCR35JF",
+    "name": "pumpkin coffee",
+    "photo": "fe/fe1e14d8.jpg",
+    "reference": "1d/1dcc46ae.jpg",
+    "split": "dev",
+    "photo_sha256": "60ac0d29135f434b81798b24e12e855fbf51b9abacfa9303f0bdec55b2682a7d",
+    "reference_sha256": "b7a64ea828771f4f2c33ed71514396ffe675aa265883436e7dd7ce2905a11799"
+  },
+  {
+    "id": "B083V9C8D2",
+    "name": "conditioner",
+    "photo": "22/22e36311.jpg",
+    "reference": "11/11545c28.jpg",
+    "split": "test",
+    "photo_sha256": "7e6e7d5c73b0fe56dbd1793bed500a41927c17ab2bcf00cafc55aabf325784bd",
+    "reference_sha256": "9bdd093303e8b9d342cf971b9dede5ceede75f629eea3d5a2c228554334953c8"
+  },
+  {
+    "id": "B074H6ZXT5",
+    "name": "coffee",
+    "photo": "45/45dc24b0.jpg",
+    "reference": "38/3848fcdb.jpg",
+    "split": "test",
+    "photo_sha256": "c43e6388f5acd9e1753d79979c95c3428b16ea6111a2563cdbae6cd83e6ab308",
+    "reference_sha256": "add58efc47df6434dc5dcfe2b4f67aa80dca48221cc180816ec8b02ab5310a75"
+  },
+  {
+    "id": "B0752GQ94S",
+    "name": "shampoo",
+    "photo": "6a/6a9c0e39.jpg",
+    "reference": "c7/c76e6501.jpg",
+    "split": "test",
+    "photo_sha256": "66904bf37f849c12fd9aeb6633e57271b8e6fa92a6418d93b5453a68e21ae213",
+    "reference_sha256": "5aa02594052cbbdc7b7298b3d656abe2f4de0c2ed5884e2deb67cd249621c46b"
+  }
+]
