@@ -1,0 +1,18 @@
+# Stable ComfyUI v0.3.12 headless environment. Install matching CUDA torch wheels before this file for GPU.
+torch==2.4.1
+torchsde==0.2.6
+torchvision==0.19.1
+numpy==2.3.3
+einops==0.8.2
+transformers==4.55.4
+tokenizers==0.21.4
+sentencepiece==0.2.2
+safetensors==0.8.0
+aiohttp==3.14.1
+PyYAML==6.0.3
+Pillow==11.3.0
+scipy==1.17.1
+tqdm==4.70.0
+psutil==7.2.2
+requests==2.34.2
+huggingface-hub==0.36.2
