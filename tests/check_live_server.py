@@ -22,7 +22,7 @@ def probe(url):
     item = items()[0]
     source, mask, _ = prepare(item)
     with tempfile.TemporaryDirectory() as folder:
-        path = Path(folder) / "p01-mask-contract.png"
+        path = Path(folder) / "product-mask-contract.png"
         rgba = source.convert("RGBA")
         rgba.putalpha(mask)
         rgba.save(path)
@@ -32,7 +32,7 @@ def probe(url):
         "2": {"class_type": "MaskToImage", "inputs": {"mask": ["1", 1]}},
         "3": {
             "class_type": "SaveImage",
-            "inputs": {"images": ["2", 0], "filename_prefix": "p01-mask-contract"},
+            "inputs": {"images": ["2", 0], "filename_prefix": "product-mask-contract"},
         },
     }
     receipt = client.request("POST", "/prompt", json={"prompt": graph}).json()

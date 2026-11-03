@@ -26,7 +26,7 @@ def main():
     parser.add_argument(
         "--model-dir",
         type=Path,
-        help="One local Diffusers inpainting snapshot (for example the P01 Yahoo snapshot)",
+        help="Local Diffusers model directory (use the pinned SD 1.5 snapshot to reproduce the published run)",
     )
     parser.add_argument("--port", type=int, default=8188)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cuda")

@@ -39,7 +39,7 @@ The predeclared acceptance checks require a foreground mean absolute pixel error
 
 ## Architecture
 
-- `src/data.py` loads four SHA-256-checked public product images and masks exported by P01. Two products are held out. The compact bundle in `examples/products/` works offline and its license is recorded in [data.md](data.md).
+- `src/data.py` loads four SHA-256-checked public product images and masks exported by [Product Background Editing](https://github.com/zzXavier/product-background-editing). Two products are held out. The compact bundle in `examples/products/` works offline and its license is recorded in [data.md](data.md).
 - `src/comfy.py` uploads the alpha-masked input, submits native ComfyUI inpainting nodes, polls the queue and downloads the prediction. The server can cache identical graph results. Reported attempts count issued editing tool calls, including injected faults.
 - `src/agent.py` validates input masks, scores the unchanged and edited regions, limits retries and records a trace. Offline replay checks input/output hashes, attempt sequence, graph seed, selected prediction and final decision.
 - `tests/check_live_server.py` independently checks the live HTTP upload and download path. The real 384×384 mask round-trip had zero changed pixels. [Probe results](results/probe/protocol.json)
