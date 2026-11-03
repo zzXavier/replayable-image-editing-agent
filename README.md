@@ -46,3 +46,4 @@ The predeclared acceptance checks require a foreground mean absolute pixel error
 
 Sources and model terms are in [UPSTREAM.md](UPSTREAM.md). Current handoff and any outstanding work are in [HANDOFF.md](HANDOFF.md).
 
+An independent clean clone regenerated all 18 formal traces and the demo. All decisions and retry counts matched; the maximum per-image RGB MAE across the 14 generated candidates was 0.013724 on a 0–255 scale. Offline replay verifies each individual run by exact content hashes. [Clean-clone evidence](results/clean-clone.json)
