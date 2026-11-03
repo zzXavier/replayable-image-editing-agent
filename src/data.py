@@ -1,4 +1,4 @@
-"""Load the small P01 product/mask bundle offline and verify every input hash."""
+"""Load the bundled product images and masks offline and verify every input hash."""
 
 import hashlib
 import json
@@ -20,7 +20,7 @@ def prepare(item):
         target = BUNDLE / rel
         digest = hashlib.sha256(target.read_bytes()).hexdigest()
         if digest != item["files"][rel]:
-            raise ValueError("P01 input bundle hash mismatch: " + rel)
+            raise ValueError("Product input bundle hash mismatch: " + rel)
         with Image.open(target) as image:
             files[name] = image.copy()
     return (

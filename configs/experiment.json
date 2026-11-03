@@ -6,5 +6,5 @@
   ],
   "max_foreground_mae": 18,
   "min_red_background_fraction": 0.35,
-  "checkpoint_source": "P01 Yahoo snapshot 719f1ac136b76609d8bd371606d0eaeda731b0dd (SD2 backbone)"
+  "checkpoint_source": "stable-diffusion-v1-5/stable-diffusion-v1-5 at 451f4fe16113bff5a5d2269ed5ad43b0592e9a14 (four-channel SD 1.5 backbone)"
 }
