@@ -1,0 +1,13 @@
+{
+  "result": "passed",
+  "task": "round-trip public product alpha mask through ComfyUI HTTP queue",
+  "item": "B07FFHHG1Q",
+  "mismatch_pixels": 0,
+  "size": [
+    384,
+    384
+  ],
+  "mask_sha256": "1d7b9c9cd51cdfd727c1a6e146109fc500be391a23663ed734dd899231ca0773",
+  "comfyui_version": "0.3.12",
+  "includes_diffusion_inference": false
+}
