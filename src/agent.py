@@ -98,11 +98,41 @@ def replay(path):
     path = Path(path)
     saved = json.loads(path.read_text())
     out = path.parent
+    if set(saved["inputs"]) != {"source.png", "mask.png"}:
+        raise ValueError("Unexpected input manifest")
     for key, digest in saved["inputs"].items():
         if checksum(out / key) != digest:
             raise ValueError("Input hash mismatch: " + key)
-    for step in saved["steps"]:
+    renders = [step for step in saved["steps"] if step["tool"] == "render"]
+    mode = saved["mode"]
+    limit = 1 if mode == "direct" else 2
+    if (
+        mode not in ("direct", "fixed", "feedback")
+        or saved["max_render_calls"] != 2
+        or len(renders) > limit
+    ):
+        raise ValueError("Render budget or policy mismatch")
+    with Image.open(out / "source.png") as source, Image.open(out / "mask.png") as mask:
+        valid = (
+            source.size == mask.size and 0.01 < (np.asarray(mask) > 127).mean() < 0.96
+        )
+    if not valid:
+        if saved["status"] != "invalid_mask" or renders:
+            raise ValueError("Invalid mask was not rejected")
+        return saved
+    last_image = None
+    last_scores = None
+    for index, step in enumerate(renders):
+        if step["attempt"] != index or step["seed"] != saved["seed"] + index:
+            raise ValueError("Seed or attempt sequence mismatch")
+        if mode == "feedback" and last_scores is not None and acceptable(last_scores):
+            raise ValueError("Unexpected retry after acceptance")
         if "image" in step:
+            if (
+                step["image"] != f"candidate-{index}.png"
+                or step["graph"]["6"]["inputs"]["seed"] != step["seed"]
+            ):
+                raise ValueError("Artifact name or graph seed mismatch")
             if checksum(out / step["image"]) != step["sha256"]:
                 raise ValueError("Output hash mismatch")
             i = step["attempt"]
@@ -117,4 +147,17 @@ def replay(path):
                 now = assess(src, im, m)
             if now != s["scores"] or acceptable(now) != s["accepted"]:
                 raise ValueError("Acceptance decision diverged")
+            last_image = step["image"]
+            last_scores = now
+    status = (
+        "tool_error"
+        if last_scores is None
+        else ("accepted" if acceptable(last_scores) else "rejected")
+    )
+    if (
+        saved["status"] != status
+        or saved.get("chosen_image") != last_image
+        or saved.get("scores") != last_scores
+    ):
+        raise ValueError("Final decision differs from the replayed calls")
     return saved

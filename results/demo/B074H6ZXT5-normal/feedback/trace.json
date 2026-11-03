@@ -1,0 +1,277 @@
+{
+  "mode": "feedback",
+  "prompt": "A studio photo of coffee with a plain red backdrop",
+  "seed": 13,
+  "max_render_calls": 2,
+  "checkpoint": "diffusers:sd15",
+  "server_source_revision": "55add502206ed5511a04215db4ab8f1cfa3d99ae",
+  "steps": [
+    {
+      "tool": "validate_mask",
+      "accepted": true,
+      "keep_fraction": 0.6629570855034722
+    },
+    {
+      "tool": "render",
+      "attempt": 0,
+      "seed": 13,
+      "image": "candidate-0.png",
+      "sha256": "a2bfc8e8ba235a23094d8fea85c30c516303a3df6fd853778284a112f9ab5895",
+      "graph": {
+        "1": {
+          "class_type": "DiffusersLoader",
+          "inputs": {
+            "model_path": "sd15"
+          }
+        },
+        "2": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "candidate-0-input.png"
+          }
+        },
+        "3": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "A studio photo of coffee with a plain red backdrop",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "5": {
+          "class_type": "InpaintModelConditioning",
+          "inputs": {
+            "positive": [
+              "3",
+              0
+            ],
+            "negative": [
+              "4",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ],
+            "pixels": [
+              "2",
+              0
+            ],
+            "mask": [
+              "2",
+              1
+            ],
+            "noise_mask": true
+          }
+        },
+        "6": {
+          "class_type": "KSampler",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "seed": 13,
+            "steps": 12,
+            "cfg": 7,
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "positive": [
+              "5",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "latent_image": [
+              "5",
+              2
+            ],
+            "denoise": 1
+          }
+        },
+        "7": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "6",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "8": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "images": [
+              "7",
+              0
+            ],
+            "filename_prefix": "vision_edit"
+          }
+        }
+      }
+    },
+    {
+      "tool": "evaluate",
+      "attempt": 0,
+      "scores": {
+        "keep_error": 19.697648250253177,
+        "red_background": 0.09392543109519307
+      },
+      "accepted": false
+    },
+    {
+      "tool": "render",
+      "attempt": 1,
+      "seed": 14,
+      "image": "candidate-1.png",
+      "sha256": "c682849a33af45d905dad2f4fcfeedc19d3cf504d8b523aa74086f607da3d35d",
+      "graph": {
+        "1": {
+          "class_type": "DiffusersLoader",
+          "inputs": {
+            "model_path": "sd15"
+          }
+        },
+        "2": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "candidate-1-input.png"
+          }
+        },
+        "3": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "A studio photo of coffee with a plain red backdrop",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "text": "",
+            "clip": [
+              "1",
+              1
+            ]
+          }
+        },
+        "5": {
+          "class_type": "InpaintModelConditioning",
+          "inputs": {
+            "positive": [
+              "3",
+              0
+            ],
+            "negative": [
+              "4",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ],
+            "pixels": [
+              "2",
+              0
+            ],
+            "mask": [
+              "2",
+              1
+            ],
+            "noise_mask": true
+          }
+        },
+        "6": {
+          "class_type": "KSampler",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "seed": 14,
+            "steps": 12,
+            "cfg": 7,
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "positive": [
+              "5",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "latent_image": [
+              "5",
+              2
+            ],
+            "denoise": 1
+          }
+        },
+        "7": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "6",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "8": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "images": [
+              "7",
+              0
+            ],
+            "filename_prefix": "vision_edit"
+          }
+        }
+      }
+    },
+    {
+      "tool": "evaluate",
+      "attempt": 1,
+      "scores": {
+        "keep_error": 11.632619658950254,
+        "red_background": 0.2920179480472444
+      },
+      "accepted": false
+    }
+  ],
+  "inputs": {
+    "source.png": "dd13db3d8c2d38543118023c95ecb282a3b43a140405a86b0a474c7783b29d96",
+    "mask.png": "5ffa34a7accb9ef9d0120f2b9e4f7f9a59b8fd9f1332bbacd21c98538f06a7a8"
+  },
+  "chosen_image": "candidate-1.png",
+  "scores": {
+    "keep_error": 11.632619658950254,
+    "red_background": 0.2920179480472444
+  },
+  "status": "rejected"
+}

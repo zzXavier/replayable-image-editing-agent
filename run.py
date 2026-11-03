@@ -45,6 +45,25 @@ def evaluate(out):
         )
         w.writeheader()
         w.writerows(rows)
+    summary = {}
+    for mode in ("direct", "fixed", "feedback"):
+        scenarios = {}
+        for suffix in ("normal", "bad-mask", "tool-fault"):
+            group = [
+                r
+                for r in rows
+                if r["mode"] == mode and r["case"].endswith("-" + suffix)
+            ]
+            if group:
+                scenarios[suffix] = {
+                    "tasks": len(group),
+                    "accepted": sum(r["status"] == "accepted" for r in group),
+                    "invalid_masks": sum(r["status"] == "invalid_mask" for r in group),
+                    "render_attempts": sum(r["render_calls"] for r in group),
+                    "with_prediction": sum("keep_error" in r for r in group),
+                }
+        summary[mode] = scenarios
+    (out / "summary.json").write_text(json.dumps(summary, indent=2))
     from src.panel import panel
 
     for folder in sorted(out.glob("*-normal")):
@@ -75,7 +94,11 @@ if __name__ == "__main__":
             p.error(
                 "Specify --checkpoint using the exact ComfyUI inpainting checkpoint filename"
             )
-        engine = Comfy(a.url, a.checkpoint)
+        engine = Comfy(
+            a.url,
+            a.checkpoint,
+            deadline=int(os.getenv("COMFY_DEADLINE_SECONDS", "600")),
+        )
         engine.revision = a.server_revision
         engine.request("GET", "/system_stats")
         folder = a.checkpoint.startswith("diffusers:")
