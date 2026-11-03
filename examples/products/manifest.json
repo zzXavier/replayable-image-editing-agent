@@ -1,0 +1,66 @@
+[
+  {
+    "id": "B07FFHHG1Q",
+    "split": "dev",
+    "name": "lemonade",
+    "size": 384,
+    "source_path": "90/90408e42.jpg",
+    "original_sha256": "064e8dc335dd10e66aa6356a82e9e6a8b790beaef177675e42d1e9860ac9d700",
+    "files": {
+      "B07FFHHG1Q/input.png": "32fcfcfe5f3bbec1012dfb2e556f27235dd0cf7463d94eb869cfcd4a3b957c3a",
+      "B07FFHHG1Q/mask.png": "34c969daf801982a83fcc5313e35e643c46f17d558e5c77b474bbdc5ee8fb24f"
+    },
+    "requests": [
+      "Product photo of lemonade on a plain red studio background",
+      "Product photo of lemonade on a plain blue studio background"
+    ]
+  },
+  {
+    "id": "B07QCR35JF",
+    "split": "dev",
+    "name": "pumpkin coffee",
+    "size": 384,
+    "source_path": "fe/fe1e14d8.jpg",
+    "original_sha256": "60ac0d29135f434b81798b24e12e855fbf51b9abacfa9303f0bdec55b2682a7d",
+    "files": {
+      "B07QCR35JF/input.png": "24b809a8c773841a7da64a791e953aa1dfc98647e0e20bfa27d22123aca4fe5c",
+      "B07QCR35JF/mask.png": "d8c5a17397e05cac63295df503d02b1ce7bfa4faeacdb869f3c89268568ed10a"
+    },
+    "requests": [
+      "Product photo of pumpkin coffee on a plain red studio background",
+      "Product photo of pumpkin coffee on a plain blue studio background"
+    ]
+  },
+  {
+    "id": "B074H6ZXT5",
+    "split": "test",
+    "name": "coffee",
+    "size": 384,
+    "source_path": "45/45dc24b0.jpg",
+    "original_sha256": "c43e6388f5acd9e1753d79979c95c3428b16ea6111a2563cdbae6cd83e6ab308",
+    "files": {
+      "B074H6ZXT5/input.png": "dd13db3d8c2d38543118023c95ecb282a3b43a140405a86b0a474c7783b29d96",
+      "B074H6ZXT5/mask.png": "5ffa34a7accb9ef9d0120f2b9e4f7f9a59b8fd9f1332bbacd21c98538f06a7a8"
+    },
+    "requests": [
+      "Product photo of coffee on a plain red studio background",
+      "Product photo of coffee on a plain blue studio background"
+    ]
+  },
+  {
+    "id": "B0752GQ94S",
+    "split": "test",
+    "name": "shampoo",
+    "size": 384,
+    "source_path": "6a/6a9c0e39.jpg",
+    "original_sha256": "66904bf37f849c12fd9aeb6633e57271b8e6fa92a6418d93b5453a68e21ae213",
+    "files": {
+      "B0752GQ94S/input.png": "08e09b7ced0268c177175f77289b7ed8fe1967c4ef4da6a323391f84467ab0cc",
+      "B0752GQ94S/mask.png": "0c0fe94acd605e22f4d43f68bb77964f024cdfc89576516d5d3a2f1b7980da62"
+    },
+    "requests": [
+      "Product photo of shampoo on a plain red studio background",
+      "Product photo of shampoo on a plain blue studio background"
+    ]
+  }
+]
